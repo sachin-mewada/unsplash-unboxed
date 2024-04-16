@@ -5,12 +5,11 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.systems.unsplashunboxed.data.models.ApiError
-import com.systems.unsplashunboxed.data.models.ApiResponseData
+import androidx.lifecycle.viewModelScope
+import com.systems.unsplashunboxed.data.models.ApiCallingState
 import com.systems.unsplashunboxed.data.retrofit.getRetrofitService
 import com.systems.unsplashunboxed.utils.Constants
 import com.systems.unsplashunboxed.utils.Utils
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -21,35 +20,52 @@ import kotlinx.coroutines.launch
  */
 class HomeActivityViewModel() : ViewModel() {
 
-    private val _liveData = MutableLiveData<List<ApiResponseData>>()
-    val liveData: LiveData<List<ApiResponseData>> = _liveData
+    /**
+     * _image state
+     */
+    private val _imageState = MutableLiveData<ApiCallingState>()
 
-
-    private val _errorLiveData = MutableLiveData<ApiError>()
-    val errorLiveData: LiveData<ApiError> = _errorLiveData
-
+    /**
+     * Image state
+     */
+    val imageState: LiveData<ApiCallingState> = _imageState
 
     /**
      * Get images
      *
      * @param context
      */
+
     fun getImages(context: Context) {
-        CoroutineScope(Dispatchers.IO).launch {
-            Log.d("thereasd", Thread.currentThread().name)
+        _imageState.value = ApiCallingState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response =
                     getRetrofitService(context).getUnsplashImages(Constants.CLIENT_ID, 100)
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        _liveData.postValue(it)
-                    } ?: _errorLiveData.postValue(Utils.apiErrorHandler(response.raw(), null))
+                        _imageState.postValue(ApiCallingState.Success(it))
+                    } ?: _imageState.postValue(
+                        ApiCallingState.Error(
+                            Utils.apiErrorHandler(
+                                response.raw(),
+                                null
+                            )
+                        )
+                    )
                 } else {
-                    _errorLiveData.postValue(Utils.apiErrorHandler(response.raw(), null))
+                    _imageState.postValue(
+                        ApiCallingState.Error(
+                            Utils.apiErrorHandler(
+                                response.raw(),
+                                null
+                            )
+                        )
+                    )
                 }
             } catch (ex: Exception) {
                 Log.e("error123", ex.message!!)
-                _errorLiveData.postValue(Utils.apiErrorHandler(null, ex))
+                _imageState.postValue(ApiCallingState.Error(Utils.apiErrorHandler(null, ex)))
             }
         }
     }
