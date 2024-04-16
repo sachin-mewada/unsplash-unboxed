@@ -8,6 +8,6 @@ package com.systems.unsplashunboxed.data.models
  * @constructor Create empty Api error
  */
 data class ApiError(
-    val image:Int,
-    val message:String
+    val image: Int,
+    val message: String
 )

@@ -11,9 +11,9 @@ package com.systems.unsplashunboxed.data.models
  * @constructor Create empty Image urls
  */
 data class ImageUrls(
-val full: String,
-val raw: String,
-val regular: String,
-val small: String,
-val thumb: String
+    val full: String,
+    val raw: String,
+    val regular: String,
+    val small: String,
+    val thumb: String
 )

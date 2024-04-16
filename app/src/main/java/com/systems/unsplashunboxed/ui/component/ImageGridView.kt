@@ -27,7 +27,7 @@ fun ImageGridView(list: List<ApiResponseData>) {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(list) {
-            Log.d("imagegrid", "$list")
+            Log.d("imageGrid", "$list")
             ImageCard(it.urls.regular)
         }
     }

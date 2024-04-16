@@ -1,20 +1,18 @@
 package com.systems.unsplashunboxed.ui.home
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresExtension
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.systems.unsplashunboxed.data.models.ApiError
 import com.systems.unsplashunboxed.data.models.ApiResponseData
 import com.systems.unsplashunboxed.data.retrofit.getRetrofitService
 import com.systems.unsplashunboxed.utils.Constants
 import com.systems.unsplashunboxed.utils.Utils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 
 /**
  * Home activity view model
@@ -27,7 +25,6 @@ class HomeActivityViewModel() : ViewModel() {
     val liveData: LiveData<List<ApiResponseData>> = _liveData
 
 
-
     private val _errorLiveData = MutableLiveData<ApiError>()
     val errorLiveData: LiveData<ApiError> = _errorLiveData
 
@@ -38,14 +35,15 @@ class HomeActivityViewModel() : ViewModel() {
      * @param context
      */
     fun getImages(context: Context) {
-        viewModelScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
+            Log.d("thereasd", Thread.currentThread().name)
             try {
                 val response =
                     getRetrofitService(context).getUnsplashImages(Constants.CLIENT_ID, 100)
                 if (response.isSuccessful) {
                     response.body()?.let {
-                    _liveData.postValue(it)
-                    }?:_errorLiveData.postValue(Utils.apiErrorHandler(response.raw(), null))
+                        _liveData.postValue(it)
+                    } ?: _errorLiveData.postValue(Utils.apiErrorHandler(response.raw(), null))
                 } else {
                     _errorLiveData.postValue(Utils.apiErrorHandler(response.raw(), null))
                 }

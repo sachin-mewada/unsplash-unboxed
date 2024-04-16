@@ -95,6 +95,7 @@ object Utils {
                         "Unable to connect to the server. Please check your internet connection."
                     )
                 }
+
                 is ConnectException -> {
                     ApiError(
                         R.drawable.id_error,
@@ -122,6 +123,7 @@ object Utils {
                         "Network error. Please check your internet connection and try again."
                     )
                 }
+
                 else -> {
                     ApiError(R.drawable.id_error, "Unexpected error: ${exception?.message}")
                 }
