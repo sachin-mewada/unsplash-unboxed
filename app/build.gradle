@@ -91,6 +91,8 @@ dependencies {
     implementation libs.coil
     implementation(libs.coil.compose)
     implementation("io.coil-kt:coil:1.1.0")
+    implementation "com.google.accompanist:accompanist-coil:0.15.0"
+
 
 
 }
