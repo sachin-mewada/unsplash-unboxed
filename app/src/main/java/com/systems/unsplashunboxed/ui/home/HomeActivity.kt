@@ -4,8 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import com.systems.unsplashunboxed.data.models.ApiCallingState
 import com.systems.unsplashunboxed.ui.component.ErrorView
 import com.systems.unsplashunboxed.ui.component.ImageGridView
+import com.systems.unsplashunboxed.ui.component.LoadingView
 
 /**
  * Home activity
@@ -22,14 +24,25 @@ class HomeActivity : ComponentActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.liveData.observe(this) {
-            setContent {
-                ImageGridView(list = it)
-            }
-        }
-        viewModel.errorLiveData.observe(this) {
-            setContent {
-                ErrorView(it.image, it.message)
+        viewModel.imageState.observe(this) {
+            when (it) {
+                is ApiCallingState.Loading -> {
+                    setContent {
+                        LoadingView()
+                    }
+                }
+
+                is ApiCallingState.Success -> {
+                    setContent {
+                        ImageGridView(list = it.data)
+                    }
+                }
+
+                is ApiCallingState.Error -> {
+                    setContent {
+                        ErrorView(it.error.image, it.error.message)
+                    }
+                }
             }
         }
     }
