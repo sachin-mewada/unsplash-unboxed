@@ -6,19 +6,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.systems.unsplashunboxed.data.di.DaggerDaggerHelper
 import com.systems.unsplashunboxed.data.models.ApiCallingState
-import com.systems.unsplashunboxed.data.retrofit.getRetrofitService
+import com.systems.unsplashunboxed.data.retrofit.RetrofitService
 import com.systems.unsplashunboxed.utils.Constants
 import com.systems.unsplashunboxed.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * Home activity view model
  *
  * @constructor Create empty Home activity view model
  */
-class HomeActivityViewModel() : ViewModel() {
+class HomeActivityViewModel(): ViewModel() {
 
     /**
      * _image state
@@ -37,11 +39,12 @@ class HomeActivityViewModel() : ViewModel() {
      */
 
     fun getImages(context: Context) {
+        val component = DaggerDaggerHelper.builder().build().retrofitService()
         _imageState.value = ApiCallingState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response =
-                    getRetrofitService(context).getUnsplashImages(Constants.CLIENT_ID, 100)
+                    component.getRetrofitService(context).getUnsplashImages(Constants.CLIENT_ID, 100)
                 if (response.isSuccessful) {
                     response.body()?.let {
                         _imageState.postValue(ApiCallingState.Success(it))
