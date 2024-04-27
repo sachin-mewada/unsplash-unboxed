@@ -32,6 +32,9 @@ class HomeActivityViewModel(): ViewModel() {
      */
     val imageState: LiveData<ApiCallingState> = _imageState
 
+    @Inject
+    lateinit var retrofitService: RetrofitService
+
     /**
      * Get images
      *
@@ -39,12 +42,13 @@ class HomeActivityViewModel(): ViewModel() {
      */
 
     fun getImages(context: Context) {
-        val component = DaggerDaggerHelper.builder().build().retrofitService()
+        val component = DaggerDaggerHelper.builder().build()
+        component.dependencyProvider(this)
         _imageState.value = ApiCallingState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response =
-                    component.getRetrofitService(context).getUnsplashImages(Constants.CLIENT_ID, 100)
+                    retrofitService.getRetrofitService(context).getUnsplashImages(Constants.CLIENT_ID, 100)
                 if (response.isSuccessful) {
                     response.body()?.let {
                         _imageState.postValue(ApiCallingState.Success(it))
