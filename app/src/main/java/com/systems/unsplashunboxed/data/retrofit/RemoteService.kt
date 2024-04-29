@@ -20,8 +20,8 @@ import javax.inject.Inject
  * @param context
  * @return
  */
-class RetrofitService @Inject constructor() {
-    fun getRetrofitService(context: Context): ApiInterface {
+class RemoteService @Inject constructor() {
+    fun getApiInterface(context: Context): ApiInterface {
 
         val retrofit = Retrofit.Builder().baseUrl(Constants.BASE_URL)
             .client(provideHttpClient(context))

@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.systems.unsplashunboxed.data.di.DaggerDaggerHelper
 import com.systems.unsplashunboxed.data.models.ApiCallingState
-import com.systems.unsplashunboxed.data.retrofit.RetrofitService
+import com.systems.unsplashunboxed.data.retrofit.RemoteService
 import com.systems.unsplashunboxed.utils.Constants
 import com.systems.unsplashunboxed.utils.Utils
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +33,7 @@ class HomeActivityViewModel(): ViewModel() {
     val imageState: LiveData<ApiCallingState> = _imageState
 
     @Inject
-    lateinit var retrofitService: RetrofitService
+    lateinit var remoteService: RemoteService
 
     /**
      * Get images
@@ -48,7 +48,7 @@ class HomeActivityViewModel(): ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response =
-                    retrofitService.getRetrofitService(context).getUnsplashImages(Constants.CLIENT_ID, 100)
+                    remoteService.getApiInterface(context).getUnsplashImages(Constants.CLIENT_ID, 100)
                 if (response.isSuccessful) {
                     response.body()?.let {
                         _imageState.postValue(ApiCallingState.Success(it))
